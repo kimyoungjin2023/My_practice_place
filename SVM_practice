@@ -21,8 +21,21 @@ svm_pracitce.fit(X, y)
 test_point = np.array([[4, 3]])
 prediction = svm_pracitce.predict(test_point)[0]
 
-# 가장 가까운 이웃 찾기
-distances, indices = svm_pracitce.kneighbors(test_point)
+# 서포트 벡터
+sv = svm_practice.support_vectors_
+plt.scatter(sv[:, 0], sv[:, 1], s=150, edgecolors='black', facecolors='none')
+
+# 결정경계
+w = svm_practice.coef_[0]
+b = svm_practice.intercept_[0]
+xx = np.linspace(0, 12, 100)
+yy = -(w[0] * xx + b) / w[1]
+plt.plot(xx, yy, 'k-', label='Decision Boundary')
+
+# 마진
+margin = 1 / np.sqrt(np.sum(w**2))
+plt.plot(xx, yy + margin, 'k--')
+plt.plot(xx, yy - margin, 'k--')
 
 # 시각화
 plt.figure(figsize=(7, 6))
@@ -34,10 +47,6 @@ plt.scatter(X[y == 1][:, 0], X[y == 1][:, 1], color='red', label='Class 1')
 # 테스트 포인트
 plt.scatter(test_point[:, 0], test_point[:, 1], color='green', s=150, marker='X', label='Test Point')
 
-# 이웃들을 선으로 연결
-for idx in indices[0]:
-    plt.plot([test_point[0][0], X[idx][0]], [test_point[0][1], X[idx][1]],
-             color='gray', linestyle='--')
 
 plt.title(f"svm_pracitce  (Predicted Class = {prediction})")
 plt.xlabel("X1")
