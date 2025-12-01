@@ -1,0 +1,58 @@
+# 재시도: 동일 작업을 다시 실행합니다.
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+iris = load_iris(as_frame=True)
+X = iris.data
+y_multi = iris.target
+y = (y_multi == 0).astype(int)  # setosa -> 1
+
+df = X.copy()
+df['is_setosa'] = y
+
+# display dataframe if helper available
+try:
+    from caas_jupyter_tools import display_dataframe_to_user
+    display_dataframe_to_user("Iris (binary) sample", df.head(10))
+except Exception:
+    print(df.head(10))
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42, stratify=y)
+clf = DecisionTreeClassifier(max_depth=3, random_state=42)
+clf.fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred, digits=4)
+cm = confusion_matrix(y_test, y_pred)
+
+print("Accuracy:", acc)
+print("\nClassification report:\n", report)
+print("Confusion matrix:\n", cm)
+
+import matplotlib.pyplot as plt
+plt.figure(figsize=(5,4))
+plt.imshow(cm, interpolation='nearest')
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted label")
+plt.ylabel("True label")
+plt.xticks([0,1], ['Not-Setosa(0)', 'Setosa(1)'])
+plt.yticks([0,1], ['Not-Setosa(0)', 'Setosa(1)'])
+for i in range(cm.shape[0]):
+    for j in range(cm.shape[1]):
+        plt.text(j, i, cm[i, j], ha="center", va="center")
+plt.colorbar()
+plt.show()
+
+plt.figure(figsize=(12,6))
+plot_tree(clf, feature_names=iris.feature_names, class_names=['Not-Setosa','Setosa'], filled=False, rounded=True)
+plt.title("Decision Tree (max_depth=3)")
+plt.show()
+
+feat_imp = pd.Series(clf.feature_importances_, index=iris.feature_names).sort_values(ascending=False)
+print("\nFeature importances:\n", feat_imp.to_string())
