@@ -1,4 +1,3 @@
-# 재시도: 동일 작업을 다시 실행합니다.
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
